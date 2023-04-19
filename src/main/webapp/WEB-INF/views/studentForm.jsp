@@ -17,6 +17,9 @@
 			<table>
 				<form:form modelAttribute="student" action="saveStudent" method="post">
 					<form:hidden path="id" />
+					<%
+                    // normalde sayfada id var ama gizli - update'te ayni id kalir'
+                    %>
 					<tr>
 						<td class="studentprop">FirstName:</td>
 						<td><form:input path="firstName" size="30" /></td>

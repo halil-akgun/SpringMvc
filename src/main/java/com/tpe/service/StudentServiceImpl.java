@@ -31,7 +31,7 @@ public class StudentServiceImpl implements StudentService {
         Student student = repository.findById(id).
                 orElseThrow(() -> new ResourceNotFoundException("Student not found by id: " + id));
 //                get(); // null ise: No such element Excp. - ozel mesaj icin: orElseThrow
-        return null;
+        return student;
     }
 
     @Override

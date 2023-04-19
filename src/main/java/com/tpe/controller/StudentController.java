@@ -4,10 +4,7 @@ import com.tpe.domain.Student;
 import com.tpe.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -46,7 +43,7 @@ public class StudentController {
 
     @PostMapping("/saveStudent")
     public String createStudent(@ModelAttribute("student") Student student) { // tum listeyi dondurebilmek icin return String
-                            // @ModelAttribute() olarak da yazilabilir
+        // @ModelAttribute() olarak da yazilabilir
         service.saveStudent(student);
         return "redirect:/students"; // asagidaki linke yonlendirir
     }
@@ -59,6 +56,17 @@ public class StudentController {
         mov.addObject("studentList", students);//students.jsp'deki isimle ayni olmali(altta)
         // 			<c:forEach items="${studentList}" var="student" varStatus="status">
         mov.setViewName("students");//students.jsp
+        return mov;
+    }
+
+
+    @GetMapping("/update")
+    public ModelAndView showFormForUpdate(@RequestParam("id") Long id) { // dolu form donecegi icin return ModelAndView
+        Student foundStudent = service.getStudentById(id);
+        ModelAndView mov = new ModelAndView();
+        mov.addObject("student", foundStudent);
+        // studentForm'da student model'ina foundStudent'i bind et
+        mov.setViewName("studentForm");
         return mov;
     }
 }
