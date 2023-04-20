@@ -1,12 +1,16 @@
 package com.tpe.controller;
 
 import com.tpe.domain.Student;
+import com.tpe.exception.ResourceNotFoundException;
 import com.tpe.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -41,9 +45,18 @@ public class StudentController {
     } // @ModelAttribute : formdaki bilgilerle std objesi olusturur, sonra bu objenin kullanilmasini saglar
     // submit: http://localhost:8080/SpringMvc/students/saveStudent method: POST
 
-    @PostMapping("/saveStudent")
-    public String createStudent(@ModelAttribute("student") Student student) { // tum listeyi dondurebilmek icin return String
-        // @ModelAttribute() olarak da yazilabilir
+//    @PostMapping("/saveStudent") // @Valid: @NotBlank...lari kontrol et
+//    public String createStudent(@Valid @ModelAttribute("student") Student student) { // tum listeyi dondurebilmek icin return String
+//        // @ModelAttribute() olarak da yazilabilir - ("student") zorunlu degil
+//        service.saveStudent(student);
+//        return "redirect:/students"; // asagidaki linke yonlendirir
+//    }
+
+    // @NotBlank... kontrollerinde "HTTP Status 400 – Bad Request" yerine mevcut sayfada hata mesaji icin:
+    @PostMapping("/saveStudent") // @Valid: @NotBlank...lari kontrol et
+    public String createStudent(@Valid @ModelAttribute("student") Student student, BindingResult bindingResult) { // tum listeyi dondurebilmek icin return String
+        //BindingResult: hatayi buradan okur:(stdForm.jsp)<td><form:errors path="firstName" class="error" /></td>
+        if (bindingResult.hasErrors()) return "studentForm";
         service.saveStudent(student);
         return "redirect:/students"; // asagidaki linke yonlendirir
     }
@@ -60,13 +73,46 @@ public class StudentController {
     }
 
 
+    // update: http://localhost:8080/SpringMvc/students/update?id=3
+//    @GetMapping("/update")                  // RequestParam("id") = ?id=  // birden fazla degisken oldugunda tercih edlr
+//    public ModelAndView showFormForUpdate(@RequestParam("id") Long id) { // dolu form donecegi icin return ModelAndView
+////                                                                         GetMapping("/new")'de return String idi
+//        Student foundStudent = service.getStudentById(id);
+//        ModelAndView mov = new ModelAndView();
+//        mov.addObject("student", foundStudent);// studentForm'da student model'ina foundStudent'i bind et
+//        mov.setViewName("studentForm");
+//        return mov;
+//    }
+
     @GetMapping("/update")
-    public ModelAndView showFormForUpdate(@RequestParam("id") Long id) { // dolu form donecegi icin return ModelAndView
+    public String showFormForUpdate(@RequestParam("id") Long id, Model model) {
         Student foundStudent = service.getStudentById(id);
+        model.addAttribute("student", foundStudent);
+        return "studentForm";
+    }
+
+    // delete: http://localhost:8080/SpringMvc/students/delete/3
+    @GetMapping("/delete/{id}") // burada $ yok
+    public String deleteStudent(@PathVariable("id") Long id) {//requestle gelen id'yi PathVariable ile al Long id'ye koy
+        service.deleteStudent(id);
+        return "redirect:/students";
+    }
+
+    // exception handle
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ModelAndView notFoundException(Exception ex) {
         ModelAndView mov = new ModelAndView();
-        mov.addObject("student", foundStudent);
-        // studentForm'da student model'ina foundStudent'i bind et
-        mov.setViewName("studentForm");
+        mov.addObject("message", ex.getMessage());
+        mov.setViewName("notFound");
         return mov;
+    } // ExceptionHandler belirtilen exception sinifi icin bir method belirlememizi saglar
+    // bu method exceptioni yakalar ve ozel bir islem(notFound.jsp gosterilmesi) uygular
+
+
+    // restful service: tum kayitlari dondur: http://localhost:8080/SpringMvc/students/restAll
+    @GetMapping("/restAll")
+    @ResponseBody // response'un dogrudan HTTP'ye json olarak yazilmasini saglar
+    public List<Student> getAllStudents() {
+        return service.getAll();
     }
 }
