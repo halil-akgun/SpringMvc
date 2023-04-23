@@ -116,3 +116,21 @@ public class StudentController {
         return service.getAll();
     }
 }
+/*
+@GetMapping
+    @RequestMapping("/update") kullanimi
+ile
+    @GetMapping("/update") kullanimi
+arasinda fark var mi
+
+chatGPT:
+@GetMapping("/update") doğrudan /update istek yoluyla tetiklenecek bir GET isteğine karşılık gelirken,
+@RequestMapping("/update") tüm HTTP metodlarını (GET, POST, PUT, DELETE vb.) /update istek yolunu eşleştirir.
+
+Bu nedenle, @RequestMapping("/update") kullanımı, /update istek yolunu kullanarak farklı HTTP metodlarını yönetmek
+istediğiniz durumlarda daha esnek bir yaklaşım sunar. Ancak sadece GET istekleriyle sınırlıysanız,
+@GetMapping("/update") kullanımı daha açıklayıcı ve okunabilir olabilir.
+
+Bununla birlikte, @RequestMapping ayrıca daha geniş kapsamlı ve karmaşık URL eşleştirmeleri ve özel parametreler
+belirtmek için kullanılabilir, bu da @GetMapping gibi tek bir HTTP metoduyla sınırlı olan belirli durumlarda yararlı olabilir.
+ */
